@@ -1,0 +1,299 @@
+<!doctype html>
+<html lang="en" class="no-js is-loading">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>devbyfarhad — Creative Frontend Developer</title>
+<meta name="description" content="Portfolio of devbyfarhad, a creative frontend developer from Baku: 3D, motion and multilingual websites." data-i18n-attr="content:meta.desc">
+<meta name="theme-color" content="#0e0e12">
+<meta property="og:type" content="website">
+<meta property="og:title" content="devbyfarhad — Creative Frontend Developer">
+<meta property="og:description" content="3D, motion and multilingual websites built with Three.js and GSAP.">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<!-- Unbounded, Onest и JetBrains Mono: кириллица и «Ə/ə» есть во всех трёх -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Onest:wght@300..700&family=Unbounded:wght@300..800&display=swap">
+<link rel="stylesheet" href="css/style.css">
+<script>
+  /* Язык выставляем до первой отрисовки: ?lang= → сохранённый → язык браузера */
+  (function () {
+    var d = document.documentElement, l;
+    d.classList.replace('no-js', 'js');
+    try { l = new URLSearchParams(location.search).get('lang') || localStorage.getItem('dbf-lang'); } catch (e) {}
+    if (!l) { var n = (navigator.language || 'en').slice(0, 2).toLowerCase(); l = n === 'ru' || n === 'az' ? n : 'en'; }
+    if (l === 'az' || l === 'ru' || l === 'en') d.lang = l;
+  })();
+</script>
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.min.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+  }
+}
+</script>
+</head>
+<body data-theme="ink">
+<a class="skip" href="#main" data-i18n="a11y.skip">Skip to content</a>
+
+<!-- Фон: 3D-куб из 27 блоков (js/cube.js) и плёночное зерно поверх -->
+<canvas class="gl" aria-hidden="true"></canvas>
+<div class="grain" aria-hidden="true"></div>
+
+<!-- Прелоадер: счётчик и куб; уходит «жалюзи» из пяти колонок -->
+<div class="loader" aria-hidden="true">
+  <div class="loader__cols"><i></i><i></i><i></i><i></i><i></i></div>
+  <div class="loader__body">
+    <div class="cube3d cube3d--loader"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+    <div class="loader__count"><span data-loader-num>0</span><small>%</small></div>
+    <div class="loader__line"><i data-loader-bar></i></div>
+    <p class="loader__brand">devbyfarhad · <span data-i18n="loader.tag">Portfolio 2026</span></p>
+  </div>
+</div>
+
+<!-- Шторка при смене языка -->
+<div class="curtain" aria-hidden="true"><span class="curtain__word"></span></div>
+
+<div class="cursor is-hidden" aria-hidden="true"><i class="cursor__dot"></i><span class="cursor__ring"><b class="cursor__label"></b></span></div>
+
+<header class="header">
+  <a class="logo" href="#top" aria-label="devbyfarhad">
+    <span class="cube3d cube3d--logo" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></span>
+    <span class="logo__text">devbyfarhad</span>
+  </a>
+  <nav class="nav" aria-label="Menu">
+    <a class="roll" href="#about"><span data-i18n="nav.about" data-text="About">About</span></a>
+    <a class="roll" href="#services"><span data-i18n="nav.services" data-text="Services">Services</span></a>
+    <a class="roll" href="#work"><span data-i18n="nav.work" data-text="Work">Work</span></a>
+    <a class="roll" href="#tools"><span data-i18n="nav.tools" data-text="Toolbox">Toolbox</span></a>
+    <a class="roll" href="#process"><span data-i18n="nav.process" data-text="Process">Process</span></a>
+    <a class="roll" href="#contact"><span data-i18n="nav.contact" data-text="Contact">Contact</span></a>
+  </nav>
+  <div class="lang" role="group" aria-label="Language">
+    <span class="lang__pill" aria-hidden="true"></span>
+    <button type="button" data-lang="az" lang="az">AZ</button>
+    <button type="button" data-lang="ru" lang="ru">RU</button>
+    <button type="button" data-lang="en" lang="en">EN</button>
+  </div>
+  <button class="burger" type="button" aria-expanded="false" aria-controls="menu" data-i18n-attr="aria-label:menu.open"><span></span><span></span></button>
+</header>
+
+<div class="menu" id="menu" inert>
+  <nav class="menu__nav" aria-label="Menu">
+    <a href="#about"><small>01</small><span data-i18n="nav.about">About</span></a>
+    <a href="#services"><small>02</small><span data-i18n="nav.services">Services</span></a>
+    <a href="#work"><small>03</small><span data-i18n="nav.work">Work</span></a>
+    <a href="#tools"><small>04</small><span data-i18n="nav.tools">Toolbox</span></a>
+    <a href="#process"><small>05</small><span data-i18n="nav.process">Process</span></a>
+    <a href="#contact"><small>06</small><span data-i18n="nav.contact">Contact</span></a>
+  </nav>
+  <ul class="menu__foot socials" data-socials></ul>
+</div>
+
+<!-- Прогресс страницы: кольцо с процентом, по клику — наверх -->
+<button class="progress" type="button" data-i18n-attr="aria-label:footer.top">
+  <svg class="progress__ring" viewBox="0 0 48 48" aria-hidden="true"><circle class="progress__track" cx="24" cy="24" r="21"/><circle class="progress__bar" cx="24" cy="24" r="21"/></svg>
+  <span class="progress__num" aria-hidden="true">0</span>
+  <svg class="progress__arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M6 11l6-6 6 6"/></svg>
+</button>
+<div class="indicator" aria-hidden="true"><span class="indicator__num">00</span><i></i><span class="indicator__name">Intro</span></div>
+
+<main id="main">
+
+  <!-- 00 · Первый экран -->
+  <section class="hero" id="top" data-theme="ink" data-name="nav.intro">
+    <div class="hero__top">
+      <span class="status"><i></i><span data-i18n="status">Open to projects</span></span>
+      <span class="hero__role">Creative Frontend Developer</span>
+      <span class="hero__time"><span data-i18n="hero.time">Local time</span> · <span data-cfg="city">Baku</span><b data-clock>--:--:--</b></span>
+    </div>
+    <h1 class="hero__title">
+      <span class="hero__line" data-i18n="hero.l1">Turning ideas</span>
+      <span class="hero__line" data-i18n-html="hero.l2">into <em>reality</em></span>
+      <span class="hero__line" data-i18n="hero.l3">through code.</span>
+    </h1>
+    <div class="hero__bottom">
+      <p class="hero__lead" data-i18n="hero.lead">Frontend developer from Baku. I build fast, multilingual websites with 3D scenes and motion that people actually remember.</p>
+      <a class="btn btn--accent" href="#work" data-magnetic>
+        <span class="btn__fill" aria-hidden="true"></span>
+        <span data-i18n="hero.cta">See my work</span>
+        <svg class="btn__icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </a>
+      <a class="badge" href="#about" data-magnetic data-i18n-attr="aria-label:hero.scroll">
+        <svg class="badge__ring" viewBox="0 0 100 100" aria-hidden="true">
+          <defs><path id="badge-path" d="M50 50m-38 0a38 38 0 1 1 76 0a38 38 0 1 1-76 0"/></defs>
+          <text><textPath href="#badge-path" textLength="236" lengthAdjust="spacing" data-badge-text>SCROLL TO EXPLORE • SCROLL TO EXPLORE • </textPath></text>
+        </svg>
+        <span class="badge__core"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M6 13l6 6 6-6"/></svg></span>
+      </a>
+    </div>
+  </section>
+
+  <!-- Две бегущие ленты крест-накрест: скорость и направление — от скролла -->
+  <div class="bands" aria-hidden="true">
+    <div class="band band--b"><div class="band__track" data-band="-1"></div></div>
+    <div class="band band--a"><div class="band__track" data-band="1"></div></div>
+  </div>
+
+  <!-- 01 · Обо мне -->
+  <section class="about section" id="about" data-theme="paper" data-name="nav.about">
+    <div class="about__slot" aria-hidden="true"></div>
+    <span class="eyebrow"><b>01</b><span data-i18n="nav.about">About</span></span>
+    <p class="about__text" data-i18n-html="about.text">Hi, I’m Farhad — a frontend developer who turns ideas into <em>living</em> interfaces.</p>
+    <ul class="stats">
+      <li class="stat" data-reveal><b class="stat__num"><span data-count="10">0</span><sup>+</sup></b><span class="stat__label" data-i18n="about.s1">animation &amp; 3D libraries in production</span></li>
+      <li class="stat" data-reveal><b class="stat__num"><span data-count="3">0</span></b><span class="stat__label" data-i18n="about.s2">languages in my interfaces — AZ · RU · EN</span></li>
+      <li class="stat" data-reveal><b class="stat__num"><span data-count="60">0</span><sup>fps</sup></b><span class="stat__label" data-i18n="about.s3">the bar for every animation</span></li>
+      <li class="stat" data-reveal><b class="stat__num"><span data-count="2">0</span></b><span class="stat__label" data-i18n="about.s4">public repositories on GitHub</span></li>
+    </ul>
+  </section>
+
+  <!-- 02 · Услуги: четыре грани коробки, которая поворачивается от скролла -->
+  <section class="services" id="services" data-theme="blue" data-name="nav.services">
+    <div class="services__pin">
+      <div class="services__head">
+        <span class="eyebrow"><b>02</b><span data-i18n="nav.services">Services</span></span>
+        <h2 class="title" data-split data-i18n-html="services.title">What I <em>do</em></h2>
+      </div>
+      <div class="box">
+        <div class="box__rot">
+          <article class="face" style="--i:0">
+            <div class="face__top">
+              <span class="face__num">01</span>
+              <svg class="face__icon face__icon--spin" viewBox="0 0 48 48" aria-hidden="true"><path d="M24 4 42 14v20L24 44 6 34V14z"/><path d="m6 14 18 10 18-10M24 24v20"/></svg>
+            </div>
+            <h3 class="face__title" data-i18n="services.s1.t">3D &amp; WebGL</h3>
+            <p class="face__text" data-i18n="services.s1.d">Interactive Three.js scenes.</p>
+            <ul class="face__tags"><li>Three.js</li><li>WebGL</li><li>GLSL</li><li>Particles</li></ul>
+            <i class="face__shade" aria-hidden="true"></i>
+          </article>
+          <article class="face" style="--i:1">
+            <div class="face__top">
+              <span class="face__num">02</span>
+              <svg class="face__icon face__icon--wave" viewBox="0 0 48 48" aria-hidden="true"><path d="M3 34c9 0 9-20 21-20s12 20 21 20"/><circle cx="24" cy="14" r="4"/></svg>
+            </div>
+            <h3 class="face__title" data-i18n="services.s2.t">Motion &amp; interaction</h3>
+            <p class="face__text" data-i18n="services.s2.d">Scroll storytelling with GSAP.</p>
+            <ul class="face__tags"><li>GSAP</li><li>ScrollTrigger</li><li>Lenis</li><li>SVG</li></ul>
+            <i class="face__shade" aria-hidden="true"></i>
+          </article>
+          <article class="face" style="--i:2">
+            <div class="face__top">
+              <span class="face__num">03</span>
+              <svg class="face__icon face__icon--blink" viewBox="0 0 48 48" aria-hidden="true"><rect x="4" y="8" width="40" height="32" rx="5"/><path d="M4 17h40M13 27l-4 4 4 4M35 27l4 4-4 4M27 25l-6 12"/></svg>
+            </div>
+            <h3 class="face__title" data-i18n="services.s3.t">Websites &amp; landing pages</h3>
+            <p class="face__text" data-i18n="services.s3.d">Promo sites, landing pages and portfolios.</p>
+            <ul class="face__tags"><li>HTML</li><li>CSS</li><li>JavaScript</li><li>GitHub Pages</li></ul>
+            <i class="face__shade" aria-hidden="true"></i>
+          </article>
+          <article class="face" style="--i:3">
+            <div class="face__top">
+              <span class="face__num">04</span>
+              <svg class="face__icon face__icon--spin" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="19"/><path d="M5 24h38M24 5c6 6 8 12 8 19s-2 13-8 19c-6-6-8-12-8-19s2-13 8-19z"/></svg>
+            </div>
+            <h3 class="face__title" data-i18n="services.s4.t">Multilingual &amp; responsive</h3>
+            <p class="face__text" data-i18n="services.s4.d">Interfaces in Azerbaijani, Russian and English.</p>
+            <ul class="face__tags"><li>AZ</li><li>RU</li><li>EN</li><li>Mobile first</li></ul>
+            <i class="face__shade" aria-hidden="true"></i>
+          </article>
+        </div>
+      </div>
+      <div class="services__nav">
+        <span class="services__count"><b>01</b> / 04</span>
+        <span class="services__hint" data-i18n="services.hint">Scroll — the cube turns</span>
+        <span class="dots" aria-hidden="true"><i class="is-on"></i><i></i><i></i><i></i></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 03 · Работы: вертикальный скролл двигает ленту вбок -->
+  <section class="work" id="work" data-theme="ink" data-name="nav.work">
+    <div class="work__pin">
+      <div class="work__track">
+        <div class="work__intro">
+          <span class="eyebrow"><b>03</b><span data-i18n="nav.work">Work</span></span>
+          <h2 class="title" data-split data-i18n-html="work.title">Selected <em>work</em></h2>
+          <p class="work__sub" data-i18n="work.sub">Real projects with live demos and source code.</p>
+          <span class="work__hint"><span data-i18n="work.hint">Keep scrolling</span><svg viewBox="0 0 32 12" aria-hidden="true"><path d="M0 6h30M25 1l5 5-5 5"/></svg></span>
+        </div>
+        <!-- Карточки проектов вставляет app.js из config.js -->
+        <article class="card card--cta">
+          <svg class="card--cta__star" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0c1.2 6.6 5.4 10.8 12 12-6.6 1.2-10.8 5.4-12 12-1.2-6.6-5.4-10.8-12-12C6.6 10.8 10.8 6.6 12 0z"/></svg>
+          <h3 data-i18n="work.cta.title">Your project could be next</h3>
+          <p data-i18n="work.cta.text">Let’s build something people will want to share.</p>
+          <a class="btn btn--ink" href="#contact" data-magnetic>
+            <span class="btn__fill" aria-hidden="true"></span>
+            <span data-i18n="work.cta.btn">Start a project</span>
+            <svg class="btn__icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </a>
+        </article>
+      </div>
+      <div class="work__bar" aria-hidden="true"><i></i></div>
+    </div>
+  </section>
+
+  <!-- 04 · Инструменты: теги на сфере -->
+  <section class="tools section" id="tools" data-theme="paper" data-name="nav.tools">
+    <span class="eyebrow"><b>04</b><span data-i18n="nav.tools">Toolbox</span></span>
+    <h2 class="title" data-split data-i18n-html="tools.title">My <em>toolbox</em></h2>
+    <p class="tools__hint" data-i18n="tools.hint">Grab the sphere and spin it</p>
+    <div class="sphere" data-sphere data-cursor="drag"></div>
+  </section>
+
+  <!-- 05 · Процесс: линия рисуется скроллом -->
+  <section class="process section" id="process" data-theme="coral" data-name="nav.process">
+    <span class="eyebrow"><b>05</b><span data-i18n="nav.process">Process</span></span>
+    <h2 class="title" data-split data-i18n-html="process.title">How I <em>work</em></h2>
+    <div class="steps">
+      <div class="steps__line" aria-hidden="true"><i class="steps__fill"></i><i class="steps__head"></i></div>
+      <ol class="steps__list">
+        <li class="step"><i class="step__dot" aria-hidden="true"></i><span class="step__num" data-n="01" aria-hidden="true">01</span><div class="step__body" data-reveal><h3 data-i18n="process.1.t">Discover</h3><p data-i18n="process.1.d"></p><span class="step__keys" data-i18n="process.1.k"></span></div></li>
+        <li class="step"><i class="step__dot" aria-hidden="true"></i><span class="step__num" data-n="02" aria-hidden="true">02</span><div class="step__body" data-reveal><h3 data-i18n="process.2.t">Design</h3><p data-i18n="process.2.d"></p><span class="step__keys" data-i18n="process.2.k"></span></div></li>
+        <li class="step"><i class="step__dot" aria-hidden="true"></i><span class="step__num" data-n="03" aria-hidden="true">03</span><div class="step__body" data-reveal><h3 data-i18n="process.3.t">Develop</h3><p data-i18n="process.3.d"></p><span class="step__keys" data-i18n="process.3.k"></span></div></li>
+        <li class="step"><i class="step__dot" aria-hidden="true"></i><span class="step__num" data-n="04" aria-hidden="true">04</span><div class="step__body" data-reveal><h3 data-i18n="process.4.t">Launch</h3><p data-i18n="process.4.d"></p><span class="step__keys" data-i18n="process.4.k"></span></div></li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- 06 · Контакты: куб собирается снова и сам себя крутит -->
+  <section class="contact" id="contact" data-theme="ink" data-name="nav.contact">
+    <span class="eyebrow"><b>06</b><span data-i18n="nav.contact">Contact</span></span>
+    <h2 class="contact__title" data-i18n-html="contact.title">Have an idea?<br>Let’s make it <em>real</em>.</h2>
+    <div class="contact__row" data-reveal>
+      <p class="contact__text" data-i18n="contact.text">Open to freelance projects and collaborations.</p>
+      <a class="hello" href="#" data-hello data-magnetic="0.25" target="_blank" rel="noopener">
+        <span class="hello__fill" aria-hidden="true"></span>
+        <span class="hello__text" data-i18n="contact.btn">Say hello</span>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg>
+      </a>
+    </div>
+    <ul class="socials" data-socials data-reveal></ul>
+  </section>
+</main>
+
+<footer class="footer">
+  <p class="footer__brand" aria-hidden="true">devbyfarhad</p>
+  <div class="footer__row">
+    <span>© <span data-year>2026</span> devbyfarhad</span>
+    <span><span data-cfg="city">Baku</span> · <b data-clock>--:--:--</b></span>
+    <span data-i18n="footer.built">Built with Three.js, GSAP &amp; Lenis</span>
+    <button class="roll totop" type="button" data-totop><span data-i18n="footer.top" data-text="Back to top">Back to top</span></button>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/SplitText.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrambleTextPlugin.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/DrawSVGPlugin.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.3.4/dist/lenis.min.js"></script>
+<script src="js/config.js"></script>
+<script src="js/i18n.js"></script>
+<script src="js/sphere.js"></script>
+<script src="js/app.js"></script>
+<script type="module" src="js/cube.js"></script>
+</body>
+</html>
